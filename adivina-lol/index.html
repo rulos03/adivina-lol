@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lobby Adivina LoL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --hextech-gold: #c8aa6e;
+            --hextech-dark-blue: #010a13;
+            --hextech-magic-blue: #0acbe6;
+            --hextech-red: #ff4444;
+            --overlay-bg: rgba(1, 10, 19, 0.85);
+        }
+
+        body { 
+            font-family: 'Roboto', sans-serif; 
+            margin: 0; padding: 20px; color: #f0f0f0;
+            background-image: url('https://cmsassets.rgpub.io/sanity/images/dsfx7636/news/ffe8f50201af51a0956875d2aeeb9e662eb0b228-3840x2160.png?accountingTag=LoL'); 
+            background-color: #010a13; background-size: cover; background-attachment: fixed; background-position: center;
+            height: 100vh;
+        }
+
+        h1 { font-family: 'Cinzel', serif; color: var(--hextech-gold); text-align: center; text-shadow: 0 2px 4px black; }
+
+        /* INDICADOR DE TURNO */
+        #barra-turno {
+            text-align: center;
+            padding: 15px;
+            font-family: 'Cinzel', serif;
+            font-size: 1.5em;
+            font-weight: bold;
+            margin-bottom: 20px;
+            border: 2px solid #444;
+            background: rgba(0,0,0,0.8);
+            transition: all 0.5s;
+            display: none; /* Oculto hasta que empiece */
+        }
+        .mi-turno { border-color: var(--hextech-magic-blue) !important; color: var(--hextech-magic-blue); box-shadow: 0 0 20px var(--hextech-magic-blue); }
+        .turno-rival { border-color: var(--hextech-red) !important; color: var(--hextech-red); }
+
+        .panel-hextech {
+            background: var(--overlay-bg); border: 2px solid var(--hextech-gold);
+            padding: 20px; margin-bottom: 20px; position: relative;
+        }
+
+        /* BOTONES */
+        button { 
+            cursor: pointer; padding: 12px 25px; background: #1e2328; color: var(--hextech-gold); border: 2px solid var(--hextech-gold);
+            font-family: 'Cinzel', serif; font-weight: bold; text-transform: uppercase; transition: all 0.2s;
+        }
+        button:hover { box-shadow: 0 0 10px var(--hextech-gold); }
+        button:disabled { opacity: 0.5; cursor: not-allowed; filter: grayscale(100%); }
+
+        /* TABLERO */
+        #tablero { display: grid; grid-template-columns: repeat(7, 1fr); gap: 10px; max-width: 1000px; margin: 0 auto; opacity: 0.5; pointer-events: none; }
+        #tablero.activo { opacity: 1; pointer-events: all; }
+
+        .carta { position: relative; aspect-ratio: 1 / 1; border: 2px solid #444; overflow: hidden; }
+        .carta img { width: 100%; height: 100%; object-fit: cover; }
+        .carta-nombre { position: absolute; bottom: 0; width: 100%; background: rgba(0,0,0,0.7); text-align: center; font-size: 0.8em; padding: 2px 0; }
+        .mi-secreto { border: 3px solid var(--hextech-magic-blue) !important; box-shadow: 0 0 15px var(--hextech-magic-blue); z-index: 10; }
+        .descartado { filter: grayscale(100%) brightness(20%); }
+
+        /* OVERLAY ACCIONES (HOVER) */
+        .overlay-acciones {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(1, 10, 19, 0.85); display: flex; flex-direction: column; 
+            justify-content: center; align-items: center; gap: 10px;
+            opacity: 0; transition: opacity 0.2s; z-index: 5;
+        }
+        .carta:hover .overlay-acciones { opacity: 1; }
+        
+        .btn-accion { width: 80%; padding: 5px; font-size: 0.8em; border: 1px solid var(--hextech-gold); }
+        .btn-descartar { background: #333; color: #ccc; }
+        .btn-ultear { background: #600; color: #faa; border-color: #f00; }
+        .btn-ultear:hover { background: #f00; color: white; }
+
+        /* CHAT Y CONTROLES */
+        #controles-juego { display: flex; justify-content: space-between; align-items: center; margin-top: 10px;}
+        #chat-container { max-width: 1000px; margin: 20px auto; }
+        #mensajes { background: rgba(0,0,0,0.5); height: 150px; overflow-y: auto; padding: 10px; border: 1px solid #444; margin-bottom: 10px;}
+        .msg-sistema { color: gold; font-style: italic; }
+
+        /* OVERLAY FIN JUEGO */
+        #overlay-fin-juego { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 999; display: flex; justify-content: center; align-items: center; }
+        .oculto { display: none !important; }
+        .modal-contenido { background: #010a13; padding: 40px; border: 4px solid var(--hextech-gold); text-align: center; }
+        .titulo-fin { font-size: 4em; font-family: 'Cinzel'; margin: 0; }
+        .victoria { color: var(--hextech-magic-blue); text-shadow: 0 0 20px var(--hextech-magic-blue); }
+        .derrota { color: var(--hextech-red); text-shadow: 0 0 20px var(--hextech-red); }
+
+    </style>
+</head>
+<body>
+
+    <h1>League of Guessing</h1>
+
+    <div id="barra-turno">ESPERANDO JUGADORES...</div>
+    
+    <div id="zona-seleccion" class="panel-hextech">
+        <div id="paso-conexion" style="text-align: center;">
+            <input id="inputSala" placeholder="CÓDIGO DE SALA" />
+            <button onclick="unirse()">CONECTAR</button>
+        </div>
+        <div id="menu-personaje" style="display:none; justify-content: center; gap: 10px;">
+            <label>TU CAMPEÓN:</label>
+            <select id="selectPersonaje"></select>
+            <button id="btnConfirmar" onclick="confirmarPersonaje()">FIJAR</button>
+        </div>
+    </div>
+
+    <div id="tablero"></div>
+
+    <div id="chat-container" class="panel-hextech">
+        <div id="mensajes"></div>
+        
+        <div id="controles-juego">
+            <div style="flex-grow: 1; display: flex; gap: 5px;">
+                <input id="inputMensaje" style="flex-grow: 1;" placeholder="Chat..." onkeypress="if(event.key === 'Enter') enviar()">
+                <button onclick="enviar()">ENVIAR</button>
+            </div>
+            
+            <button id="btnPasarTurno" onclick="pasarTurno()" style="margin-left: 20px; background-color: #444;" disabled>
+                PASAR TURNO ➜
+            </button>
+        </div>
+    </div>
+
+    <div id="overlay-fin-juego" class="oculto">
+        <div class="modal-contenido">
+            <h1 id="titulo-final" class="titulo-fin">VICTORIA</h1>
+            <p id="mensaje-final" style="font-size: 1.2em; color: #ddd;"></p>
+            <button onclick="location.reload()">JUGAR OTRA VEZ</button>
+        </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+        const socket = io();
+        let salaActual = "";
+        let esMiTurno = false; // Variable local para controlar el turno
+        const RIOT_IMG_URL = "https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/";
+
+        function unirse() {
+            salaActual = document.getElementById('inputSala').value;
+            if(!salaActual) return alert("Ingresa código");
+            socket.emit('entrar_sala', salaActual);
+            document.getElementById('paso-conexion').style.display = 'none';
+            document.getElementById('menu-personaje').style.display = 'flex';
+        }
+
+        socket.on('iniciar_tablero', (lista) => {
+            const tablero = document.getElementById('tablero');
+            const select = document.getElementById('selectPersonaje');
+            tablero.innerHTML = ""; select.innerHTML = "";
+            
+            lista.forEach(nombre => {
+                const opt = document.createElement('option'); opt.value = nombre; opt.innerText = nombre; select.appendChild(opt);
+                
+                const carta = document.createElement('div'); carta.className = 'carta';
+                carta.id = 'carta-'+nombre;
+
+                const img = document.createElement('img'); img.src = `${RIOT_IMG_URL}${nombre}.png`;
+                
+                // OVERLAY ACCIONES
+                const overlay = document.createElement('div'); overlay.className = 'overlay-acciones';
+                
+                const btnDesc = document.createElement('button'); 
+                btnDesc.className = 'btn-accion btn-descartar'; btnDesc.innerText = "Descartar";
+                btnDesc.onclick = (e) => {
+                    e.stopPropagation();
+                    // Descartar siempre permitido (ayuda visual)
+                    if(document.getElementById('tablero').classList.contains('activo')) carta.classList.toggle('descartado');
+                };
+
+                const btnUlt = document.createElement('button');
+                btnUlt.className = 'btn-accion btn-ultear'; btnUlt.innerText = "ULTEAR !";
+                btnUlt.onclick = (e) => {
+                    e.stopPropagation();
+                    if(!esMiTurno) return alert("¡No es tu turno! Espera a que el rival termine.");
+                    
+                    if(confirm(`¿Estás SEGURO de atacar a ${nombre}? Si fallas, pierdes el turno.`)) {
+                        socket.emit('intentar_adivinar', { sala: salaActual, personajeAdivinado: nombre });
+                    }
+                };
+
+                overlay.append(btnDesc, btnUlt);
+                carta.append(img, overlay, document.createElement('div').innerText = nombre); // nombre simple abajo
+                tablero.appendChild(carta);
+            });
+        });
+
+        function confirmarPersonaje() {
+            const pj = document.getElementById('selectPersonaje').value;
+            socket.emit('jugador_listo', { sala: salaActual, personaje: pj });
+            document.getElementById('btnConfirmar').disabled = true;
+            document.getElementById('selectPersonaje').disabled = true;
+            document.getElementById('carta-'+pj).classList.add('mi-secreto');
+            document.getElementById('barra-turno').style.display = 'block';
+            document.getElementById('barra-turno').innerText = "ESPERANDO RIVAL...";
+        }
+
+        // --- LÓGICA DE TURNOS ---
+        
+        function actualizarInterfazTurno(idTurno) {
+            const barra = document.getElementById('barra-turno');
+            const btnPasar = document.getElementById('btnPasarTurno');
+
+            if(idTurno === socket.id) {
+                // MI TURNO
+                esMiTurno = true;
+                barra.innerText = "¡ES TU TURNO!";
+                barra.className = "mi-turno";
+                
+                btnPasar.disabled = false;
+                btnPasar.style.backgroundColor = "#c8aa6e"; // Fondo Dorado
+                btnPasar.style.color = "#010a13";           // Texto Oscuro (CORRECCIÓN)
+                btnPasar.style.cursor = "pointer";
+            } else {
+                // TURNO RIVAL
+                esMiTurno = false;
+                barra.innerText = "TURNO DEL RIVAL";
+                barra.className = "turno-rival";
+                
+                btnPasar.disabled = true;
+                btnPasar.style.backgroundColor = "#333";    // Fondo Gris Oscuro
+                btnPasar.style.color = "#777";              // Texto Gris Claro
+                btnPasar.style.cursor = "not-allowed";
+            }
+        }
+
+        socket.on('inicio_partida', (data) => {
+            document.getElementById('tablero').classList.add('activo');
+            actualizarInterfazTurno(data.turno);
+            alert("¡PARTIDA INICIADA!");
+        });
+
+        socket.on('cambio_turno', (data) => {
+            actualizarInterfazTurno(data.turno);
+        });
+
+        function pasarTurno() {
+            if(!esMiTurno) return;
+            socket.emit('pasar_turno', salaActual);
+        }
+
+        // --- FIN JUEGO ---
+        socket.on('fin_juego', (data) => {
+            const modal = document.getElementById('overlay-fin-juego');
+            const titulo = document.getElementById('titulo-final');
+            const txt = document.getElementById('mensaje-final');
+            
+            modal.classList.remove('oculto');
+            if(data.ganador === socket.id) {
+                titulo.innerText = "VICTORIA"; titulo.className = "titulo-fin victoria";
+                txt.innerHTML = `Campeón enemigo eliminado: <b>${data.personaje}</b>`;
+            } else {
+                titulo.innerText = "DERROTA"; titulo.className = "titulo-fin derrota";
+                txt.innerHTML = `Te han descubierto.`;
+            }
+        });
+
+        socket.on('intento_fallido', (data) => {
+            const msg = (data.culpable === socket.id) 
+                ? "SISTEMA: Fallaste tu ultimate. Turno perdido." 
+                : `SISTEMA: El rival falló su ataque sobre ${data.personaje}. Es tu turno.`;
+            agregarTexto(msg, 'msg-sistema');
+        });
+
+        // CHAT
+        function enviar() {
+            const inp = document.getElementById('inputMensaje');
+            if(!inp.value) return;
+            socket.emit('mensaje_chat', { sala: salaActual, texto: inp.value });
+            agregarTexto("Yo: "+inp.value); inp.value="";
+        }
+        socket.on('recibir_mensaje', (m) => agregarTexto("Rival: "+m));
+        
+        function agregarTexto(t, cls) {
+            const d = document.createElement('div'); d.innerText = t; 
+            if(cls) d.className = cls; 
+            document.getElementById('mensajes').append(d);
+            document.getElementById('mensajes').scrollTop = 9999;
+        }
+    </script>
+</body>
+</html>
