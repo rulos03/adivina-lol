@@ -94,6 +94,65 @@
         .victoria { color: var(--hextech-magic-blue); text-shadow: 0 0 20px var(--hextech-magic-blue); }
         .derrota { color: var(--hextech-red); text-shadow: 0 0 20px var(--hextech-red); }
 
+        /* =========================================
+           DISEÑO RESPONSIVO (MÓVILES)
+           ========================================= */
+        @media (max-width: 768px) {
+            
+            /* 1. Ajustar el cuerpo y fondo */
+            body {
+                padding: 10px; /* Menos margen en los bordes */
+                background-attachment: scroll; /* Mejor rendimiento en móviles */
+            }
+
+            /* 2. Título más pequeño */
+            h1 {
+                font-size: 2em;
+                margin-top: 10px;
+            }
+
+            /* 3. Paneles más compactos */
+            .panel-hextech {
+                padding: 15px;
+            }
+
+            /* 4. EL CAMBIO CLAVE: El Tablero */
+            #tablero {
+                /* En vez de 7 columnas, usamos 3. 
+                   Las cartas serán más grandes y fáciles de tocar. */
+                grid-template-columns: repeat(3, 1fr) !important;
+                gap: 8px;
+            }
+
+            /* 5. Controles del Chat y Botón de Turno */
+            #controles-juego {
+                flex-direction: column; /* Poner uno debajo del otro */
+                gap: 15px;
+            }
+
+            #inputMensaje {
+                width: 100%; /* Que ocupe todo el ancho */
+            }
+
+            /* Hacemos el botón de Pasar Turno gigante para que sea fácil de tocar */
+            #btnPasarTurno {
+                width: 100%;
+                margin-left: 0 !important;
+                padding: 15px;
+                font-size: 1.2em;
+            }
+
+            /* 6. Ajustes en la carta para toque táctil */
+            .carta-nombre {
+                font-size: 0.7em; /* Texto un poco más pequeño */
+            }
+            
+            /* En móvil, los botones de acción deben ser más grandes */
+            .btn-accion {
+                padding: 12px;
+                font-size: 0.9em;
+            }
+        }
     </style>
 </head>
 <body>
