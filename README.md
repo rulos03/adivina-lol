@@ -41,7 +41,7 @@ Si quieres correr este proyecto en tu propia máquina:
 
 1.  **Clonar el repositorio**
     ```bash
-    git clone [https://github.com/TU_USUARIO/adivina-lol.git](https://github.com/TU_USUARIO/adivina-lol.git)
+    git clone [https://github.com/rulos03/adivina-lol.git](https://github.com/rulos03/adivina-lol.git)
     cd adivina-lol
     ```
 
