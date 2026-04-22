@@ -1,0 +1,129 @@
+/* ===== KEYFRAMES ===== */
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+  from { opacity: 0; transform: translateX(-50%) translateY(-12px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
+@keyframes fadeInScale {
+  from { opacity: 0; transform: scale(0.88); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+/* Glow carta secreta — esmeralda */
+@keyframes glowPulse {
+  0%, 100% {
+    box-shadow: 0 0 10px var(--color-emerald-dim),
+                inset 0 0 10px var(--color-emerald-dim);
+  }
+  50% {
+    box-shadow: 0 0 24px var(--color-emerald-dim),
+                0 0 48px oklch(60% 0.16 155 / 0.1),
+                inset 0 0 16px var(--color-emerald-dim);
+  }
+}
+
+/* Borde pulsante — mi turno */
+@keyframes pulseBorder {
+  0%, 100% { box-shadow: 0 0 8px var(--color-emerald-dim),  inset 0 0 20px oklch(60% 0.16 155 / 0.04); }
+  50%       { box-shadow: 0 0 20px var(--color-emerald-dim), inset 0 0 40px oklch(60% 0.16 155 / 0.08); }
+}
+
+/* Slide in modal */
+@keyframes slideInDown {
+  from { opacity: 0; transform: translateY(-32px) scale(0.96); }
+  to   { opacity: 1; transform: translateY(0)     scale(1); }
+}
+
+/* Shake — intento fallido */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%       { transform: translateX(-8px); }
+  40%       { transform: translateX(8px); }
+  60%       { transform: translateX(-5px); }
+  80%       { transform: translateX(5px); }
+}
+
+/* Glitch — título victoria */
+@keyframes glitch {
+  0%  { clip-path: inset(40% 0 61% 0); transform: translate(-3px, 0); }
+  10% { clip-path: inset(92% 0 1%  0); transform: translate(3px,  0); }
+  20% { clip-path: inset(43% 0 1%  0); transform: translate(-3px, 0); }
+  30% { clip-path: inset(25% 0 58% 0); transform: translate(2px,  0); }
+  40% { clip-path: inset(54% 0 7%  0); transform: translate(-2px, 0); }
+  50% { clip-path: inset(58% 0 43% 0); transform: translate(3px,  0); }
+  60% { clip-path: inset(50% 0 14% 0); transform: translate(-2px, 0); }
+  70% { clip-path: inset(28% 0 25% 0); transform: translate(3px,  0); }
+  80% { clip-path: inset(14% 0 73% 0); transform: translate(-2px, 0); }
+  90% { clip-path: inset(85% 0 5%  0); transform: translate(2px,  0); }
+  100%{ clip-path: inset(91% 0 6%  0); transform: translate(-3px, 0); }
+}
+
+/* ===== APLICACIONES ===== */
+
+/* Cartas: entrada escalonada */
+.carta {
+  animation: fadeInScale 0.3s ease-out both;
+}
+
+/* Carta secreta: glow pulsante */
+.mi-secreto {
+  animation: glowPulse 2.5s ease-in-out infinite !important;
+}
+
+/* Mi turno: borde pulsante */
+.mi-turno {
+  animation: pulseBorder 2s ease-in-out infinite;
+}
+
+/* Modal */
+.modal-contenido {
+  animation: slideInDown 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Intento fallido */
+.shake {
+  animation: shake 0.45s ease-in-out;
+}
+
+/* Glitch en el título de victoria */
+.titulo-fin.victoria::before,
+.titulo-fin.victoria::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  pointer-events: none;
+}
+
+.titulo-fin.victoria::before {
+  color: var(--color-emerald);
+  animation: glitch 2.5s infinite linear;
+  opacity: 0.5;
+}
+
+.titulo-fin.victoria::after {
+  color: var(--color-crimson);
+  animation: glitch 2.5s infinite linear reverse;
+  opacity: 0.3;
+}
+
+.titulo-fin {
+  position: relative;
+  display: inline-block;
+}
