@@ -1,0 +1,123 @@
+:root {
+  /* =============================================================
+     PALETA — "Tablero de juego premium de noche"
+     Base cálida ámbar, sin cyan AI slop.
+     Mi turno = esmeralda  |  Rival = crimson  |  Acción = dorado
+  ============================================================= */
+
+  /* --- Colores base (OKLCH — perceptualmente uniformes) --- */
+  --color-bg:          oklch(10% 0.015 78);   /* negro cálido ámbar, como madera oscura */
+  --color-surface:     oklch(14% 0.02  78);   /* superficie panel */
+  --color-surface-low: oklch(8%  0.01  78);   /* superficie oscura (chat) */
+  --color-overlay:     oklch(10% 0.015 78 / 0.88);
+
+  /* --- Dorado — acento primario --- */
+  --color-gold:        oklch(70% 0.13  82);   /* más saturado que #c8aa6e */
+  --color-gold-bright: oklch(80% 0.15  82);   /* hover / victoria */
+  --color-gold-dim:    oklch(70% 0.13  82 / 0.25);
+
+  /* --- Esmeralda — MI TURNO (reemplaza cyan AI slop) --- */
+  --color-emerald:     oklch(60% 0.16 155);
+  --color-emerald-dim: oklch(60% 0.16 155 / 0.2);
+
+  /* --- Crimson — RIVAL / peligro --- */
+  --color-crimson:     oklch(50% 0.21  22);
+  --color-crimson-dim: oklch(50% 0.21  22 / 0.2);
+
+  /* --- Texto --- */
+  --color-text-primary:   oklch(94% 0.01 78);  /* casi blanco cálido */
+  --color-text-secondary: oklch(65% 0.01 78);
+  --color-text-muted:     oklch(45% 0.01 78);
+
+  /* --- Bordes --- */
+  --color-border:         oklch(28% 0.015 78);
+  --color-border-subtle:  oklch(22% 0.01  78);
+
+  /* --- Botón --- */
+  --color-btn-bg:          oklch(18% 0.02 78);
+  --color-btn-bg-disabled: oklch(20% 0.005 78);
+
+  /* Aliases semánticos (usados en components.css) */
+  --hextech-gold:           var(--color-gold);
+  --hextech-gold-hover:     var(--color-gold-bright);
+  --hextech-dark-blue:      var(--color-bg);
+  --hextech-magic-blue:     var(--color-emerald);    /* ← reemplazado */
+  --hextech-magic-blue-dim: var(--color-emerald-dim);
+  --hextech-red:            var(--color-crimson);
+  --hextech-red-dim:        var(--color-crimson-dim);
+  --overlay-bg:             var(--color-overlay);
+
+  --text-primary:    var(--color-text-primary);
+  --text-secondary:  var(--color-text-secondary);
+  --text-muted:      var(--color-text-muted);
+
+  --bg-primary:          var(--color-bg);
+  --bg-panel:            var(--color-surface);
+  --bg-chat:             var(--color-surface-low);
+  --bg-dark:             oklch(10% 0.015 78 / 0.85);
+  --bg-button:           var(--color-btn-bg);
+  --bg-button-disabled:  var(--color-btn-bg-disabled);
+
+  --border-primary: var(--color-border);
+  --border-panel:   var(--color-gold);
+
+  /* ===== SPACING (4pt scale) ===== */
+  --spacing-xs: 4px;
+  --spacing-sm: 8px;
+  --spacing-md: 16px;
+  --spacing-lg: 24px;
+  --spacing-xl: 32px;
+
+  /* ===== TYPOGRAPHY ===== */
+  --font-display: 'Big Shoulders Display', sans-serif;
+  --font-body:    'Sora', sans-serif;
+
+  /* Escala modular 1.25 — fixed rem para app UI */
+  --text-caption:    0.75rem;
+  --text-sm:         0.875rem;
+  --text-base:       1rem;
+  --text-lead:       1.125rem;
+  --text-subhead:    1.25rem;
+  --text-heading-sm: 1.5rem;
+  --text-heading-md: 2rem;
+  --text-heading-lg: 3rem;
+  --text-display:    5rem;
+
+  --font-weight-normal:   400;
+  --font-weight-medium:   500;
+  --font-weight-semibold: 600;
+  --font-weight-bold:     700;
+  --font-weight-black:    900;
+
+  /* Line heights */
+  --leading-tight:  1.1;
+  --leading-snug:   1.3;
+  --leading-normal: 1.5;
+  --leading-loose:  1.7;
+
+  /* Letter spacing */
+  --tracking-tight:  -0.02em;
+  --tracking-normal:  0;
+  --tracking-wide:    0.05em;
+  --tracking-wider:   0.1em;
+
+  /* ===== TRANSITIONS ===== */
+  --transition-fast:   0.15s ease-out;
+  --transition-normal: 0.3s  ease-out;
+  --transition-slow:   0.5s  ease-out;
+
+  /* ===== FOCUS ===== */
+  --focus-outline: 2px solid var(--color-gold);
+  --focus-offset:  2px;
+
+  /* ===== SHADOWS ===== */
+  --shadow-gold-sm:    0 0 12px var(--color-gold-dim);
+  --shadow-gold-md:    0 0 24px var(--color-gold-dim);
+  --shadow-emerald-sm: 0 0 14px var(--color-emerald-dim);
+  --shadow-crimson-sm: 0 0 14px var(--color-crimson-dim);
+
+  /* Aliases heredados */
+  --shadow-blue-sm: var(--shadow-emerald-sm);
+  --shadow-blue-lg: var(--shadow-emerald-sm);
+  --shadow-red-sm:  var(--shadow-crimson-sm);
+}

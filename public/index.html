@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="League of Guessing — Adivina Quién multijugador con campeones de League of Legends">
+    <title>League of Guessing</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Sora:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="styles/variables.css">
+    <link rel="stylesheet" href="styles/base.css">
+    <link rel="stylesheet" href="styles/components.css">
+    <link rel="stylesheet" href="styles/animations.css">
+</head>
+<body>
+
+    <header>
+        <h1>League of Guessing</h1>
+    </header>
+
+    <main>
+        <!-- Indicador de turno -->
+        <div
+            id="barra-turno"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+        >
+            ESPERANDO JUGADORES...
+        </div>
+
+        <!-- Zona de conexión y selección de personaje -->
+        <section id="zona-seleccion" class="panel-hextech" aria-label="Configuración de partida">
+
+            <!-- Paso 1: Ingresar código de sala -->
+            <div id="paso-conexion">
+                <div class="form-group">
+                    <label for="inputSala">Código de Sala</label>
+                    <input
+                        id="inputSala"
+                        type="text"
+                        placeholder="Ingresa el código..."
+                        aria-describedby="sala-hint"
+                        maxlength="20"
+                        autocomplete="off"
+                        spellcheck="false"
+                    >
+                    <small id="sala-hint">Comparte el código con tu rival para jugar juntos</small>
+                </div>
+                <button
+                    id="btnConectar"
+                    onclick="unirse()"
+                    aria-label="Conectarse a la sala"
+                >
+                    CONECTAR
+                </button>
+            </div>
+
+            <!-- Paso 2: Seleccionar campeón secreto (oculto hasta conectarse) -->
+            <div id="menu-personaje" style="display:none;" aria-label="Selección de campeón secreto">
+                <div class="form-group">
+                    <label for="selectPersonaje">Tu Campeón Secreto</label>
+                    <select
+                        id="selectPersonaje"
+                        aria-describedby="personaje-hint"
+                    ></select>
+                    <small id="personaje-hint">El rival tendrá que adivinar este campeón</small>
+                </div>
+                <button
+                    id="btnConfirmar"
+                    onclick="confirmarPersonaje()"
+                    aria-label="Confirmar campeón secreto seleccionado"
+                >
+                    FIJAR
+                </button>
+            </div>
+
+        </section>
+
+        <!-- Tablero de cartas -->
+        <section
+            id="tablero"
+            role="grid"
+            aria-label="Tablero de campeones"
+            aria-readonly="true"
+        ></section>
+
+        <!-- Chat y controles -->
+        <section id="chat-container" class="panel-hextech" aria-label="Chat y controles de juego">
+            <div
+                id="mensajes"
+                role="log"
+                aria-live="polite"
+                aria-label="Mensajes del chat"
+            ></div>
+
+            <div id="controles-juego">
+                <div style="flex-grow:1; display:flex; gap:5px;">
+                    <label for="inputMensaje" class="visually-hidden">Mensaje de chat</label>
+                    <input
+                        id="inputMensaje"
+                        type="text"
+                        style="flex-grow:1;"
+                        placeholder="Escribe un mensaje..."
+                        aria-label="Escribir mensaje de chat"
+                        maxlength="200"
+                        autocomplete="off"
+                    >
+                    <button
+                        onclick="enviar()"
+                        aria-label="Enviar mensaje"
+                    >
+                        ENVIAR
+                    </button>
+                </div>
+
+                <button
+                    id="btnPasarTurno"
+                    onclick="pasarTurno()"
+                    style="margin-left:20px;"
+                    aria-label="Pasar turno al rival"
+                    aria-disabled="true"
+                    disabled
+                >
+                    PASAR TURNO ➜
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Modal fin de juego -->
+    <div
+        id="overlay-fin-juego"
+        class="oculto"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="titulo-final"
+        aria-describedby="mensaje-final"
+    >
+        <div class="modal-contenido">
+            <h2 id="titulo-final" class="titulo-fin">VICTORIA</h2>
+            <p id="mensaje-final"></p>
+            <button
+                onclick="location.reload()"
+                aria-label="Volver a jugar"
+            >
+                JUGAR OTRA VEZ
+            </button>
+        </div>
+    </div>
+
+    <!-- Scripts (orden de dependencias) -->
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/game-state.js"></script>
+    <script src="js/lazy-load.js"></script>
+    <script src="js/ui.js"></script>
+    <script src="js/socket-manager.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,167 @@
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* ===== FONDO CSS-GENERADO: Grid geométrico retro + scanlines ===== */
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-normal);
+  line-height: var(--leading-normal);
+  margin: 0;
+  padding: 20px;
+  color: var(--color-text-primary);
+  min-height: 100dvh;
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  /* Grid hexagonal / geométrico retro */
+  background-image:
+    /* Scanlines muy sutiles */
+    repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      oklch(0% 0 0 / 0.06) 2px,
+      oklch(0% 0 0 / 0.06) 4px
+    ),
+    /* Grid diagonal tenue */
+    repeating-linear-gradient(
+      45deg,
+      oklch(70% 0.13 82 / 0.02) 0px,
+      oklch(70% 0.13 82 / 0.02) 1px,
+      transparent 1px,
+      transparent 40px
+    ),
+    repeating-linear-gradient(
+      -45deg,
+      oklch(70% 0.13 82 / 0.02) 0px,
+      oklch(70% 0.13 82 / 0.02) 1px,
+      transparent 1px,
+      transparent 40px
+    ),
+    /* Degradado radial cálido centrado */
+    radial-gradient(
+      ellipse 80% 60% at 50% 0%,
+      oklch(16% 0.03 78) 0%,
+      var(--color-bg) 70%
+    );
+}
+
+/* Vignette en los bordes */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  background: radial-gradient(
+    ellipse 100% 100% at 50% 50%,
+    transparent 60%,
+    oklch(5% 0.01 78 / 0.6) 100%
+  );
+}
+
+/* Todo el contenido encima del vignette */
+body > * {
+  position: relative;
+  z-index: 1;
+}
+
+h1 {
+  font-family: var(--font-display);
+  font-size: var(--text-heading-lg);
+  font-weight: var(--font-weight-black);
+  line-height: var(--leading-tight);
+  letter-spacing: var(--tracking-tight);
+  color: var(--color-gold);
+  text-align: center;
+  text-transform: uppercase;
+  margin: 0 0 var(--spacing-lg);
+
+  /* Glow dorado sutil */
+  text-shadow:
+    0 0 20px oklch(70% 0.13 82 / 0.4),
+    0 2px 4px oklch(0% 0 0 / 0.8);
+}
+
+/* ===== FOCUS INDICATORS ===== */
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+a:focus-visible {
+  outline: var(--focus-outline);
+  outline-offset: var(--focus-offset);
+  box-shadow: 0 0 0 4px var(--color-gold-dim);
+}
+
+/* ===== UTILIDADES ===== */
+.oculto { display: none !important; }
+
+.visually-hidden {
+  position: absolute;
+  width: 1px; height: 1px;
+  padding: 0; margin: -1px;
+  overflow: hidden;
+  clip: rect(0,0,0,0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===== FORM GROUPS ===== */
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-xs);
+}
+
+.form-group label {
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+}
+
+.form-group small {
+  font-size: var(--text-caption);
+  color: var(--color-text-muted);
+  line-height: var(--leading-snug);
+}
+
+input, select {
+  background: oklch(16% 0.025 78);
+  color: var(--color-text-primary);
+  border: 1px solid var(--color-border);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  font-weight: var(--font-weight-medium);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+input:focus, select:focus {
+  border-color: var(--color-gold);
+  box-shadow: 0 0 0 2px var(--color-gold-dim);
+  outline: none;
+}
+
+input::placeholder { color: var(--color-text-muted); }
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 479px) {
+  body { padding: 10px; }
+  h1 { font-size: var(--text-heading-md); margin-top: 10px; }
+}
