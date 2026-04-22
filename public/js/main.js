@@ -3,13 +3,14 @@
 // --- Conectar / Unirse a sala ---
 function unirse() {
   const sala = document.getElementById('inputSala').value.trim();
+  const franquicia = getFranquicia();
   if (!sala) {
     UI.mostrarAlerta('Ingresa el código de sala');
     document.getElementById('inputSala').focus();
     return;
   }
   gameState.setSala(sala);
-  socketManager.emitEntrarSala(sala);
+  socketManager.emitEntrarSala(sala, franquicia);
   UI.mostrarMenuPersonaje();
 }
 
@@ -40,6 +41,7 @@ function enviar() {
 
 // --- Event listeners globales ---
 document.addEventListener('DOMContentLoaded', () => {
+  inicializarSelectorFranquicia();
   socketManager.init();
 
   // Tecla Enter en sala

@@ -1,7 +1,5 @@
 'use strict';
 
-const RIOT_IMG_URL = 'https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/';
-
 const UI = {
   // --- Selectors (cached) ---
   get barraTurno()      { return document.getElementById('barra-turno'); },
@@ -25,7 +23,7 @@ const UI = {
     const fragTablero = document.createDocumentFragment();
     const fragSelect  = document.createDocumentFragment();
 
-    lista.forEach((nombre, i) => {
+    lista.forEach(({ nombre, imagen }, i) => {
       // Option del select
       const opt    = document.createElement('option');
       opt.value    = nombre;
@@ -33,7 +31,7 @@ const UI = {
       fragSelect.appendChild(opt);
 
       // Carta
-      const carta = this._crearCarta(nombre, i);
+      const carta = this._crearCarta(nombre, imagen, i);
       fragTablero.appendChild(carta);
     });
 
@@ -43,7 +41,7 @@ const UI = {
     tablero.appendChild(fragTablero);
   },
 
-  _crearCarta(nombre, index) {
+  _crearCarta(nombre, imagen, index) {
     const carta  = document.createElement('div');
     carta.className = 'carta';
     carta.id        = 'carta-' + nombre;
@@ -53,7 +51,7 @@ const UI = {
 
     // Imagen con lazy loading
     const img       = document.createElement('img');
-    img.dataset.src = `${RIOT_IMG_URL}${nombre}.png`;
+    img.dataset.src = imagen;
     img.alt         = nombre;
     lazyLoader.observe(img);
 

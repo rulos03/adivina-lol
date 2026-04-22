@@ -8,9 +8,21 @@ const socketManager = (() => {
   }
 
   function init() {
-    socket.on('iniciar_tablero', (lista) => {
-      gameState.setTablero(lista);
-      UI.renderTablero(lista);
+    socket.on('iniciar_tablero', (data) => {
+      // Compatibilidad: si llega array directo, es el formato viejo
+      const { personajes, franquicia } = typeof data === 'object' && !Array.isArray(data)
+        ? data
+        : { personajes: data, franquicia: 'lol' };
+
+      // Bloquear y sincronizar el selector visual de franquicia
+      bloquearSelectorFranquicia(franquicia);
+
+      gameState.setTablero(personajes);
+      UI.renderTablero(personajes);
+    });
+
+    socket.on('error_franquicia', ({ mensaje }) => {
+      UI.mostrarAlerta(mensaje);
     });
 
     socket.on('inicio_partida', (data) => {
@@ -46,8 +58,8 @@ const socketManager = (() => {
     });
   }
 
-  function emitEntrarSala(sala) {
-    socket.emit('entrar_sala', sala);
+  function emitEntrarSala(sala, franquicia) {
+    socket.emit('entrar_sala', { sala, franquicia });
   }
 
   function emitJugadorListo(sala, personaje) {

@@ -13,27 +13,75 @@ app.get('/', (req, res) => {
 });
 
 // VARIABLES GLOBALES
-let TODOS_LOS_CAMPEONES = []; 
-const estadoSalas = {}; 
+const PERSONAJES = { lol: [], valorant: [], pokemon: [] };
+const estadoSalas = {};
 const eleccionesJugadores = {};
 
-// Carga de Datos Riot
-async function cargarCampeonesDeRiot() {
+// Utilidades
+function capitalize(s) {
+    return s.charAt(0).toUpperCase() + s.slice(1);
+}
+
+// Carga de Datos — múltiples franquicias
+async function cargarLoL() {
     try {
-        console.log("Conectando con Riot Games...");
+        console.log("Cargando League of Legends...");
         const url = "https://ddragon.leagueoflegends.com/cdn/14.1.1/data/es_ES/champion.json";
         const respuesta = await axios.get(url);
-        TODOS_LOS_CAMPEONES = Object.keys(respuesta.data.data);
-        console.log(`¡Éxito! Se cargaron ${TODOS_LOS_CAMPEONES.length} campeones.`);
+        PERSONAJES.lol = Object.keys(respuesta.data.data).map(nombre => ({
+            nombre,
+            imagen: `https://ddragon.leagueoflegends.com/cdn/14.1.1/img/champion/${nombre}.png`
+        }));
+        console.log(`✓ LoL: ${PERSONAJES.lol.length} campeones cargados`);
     } catch (error) {
-        console.error("Error cargando campeones:", error.message);
-        TODOS_LOS_CAMPEONES = ["Aatrox", "Ahri", "Garen", "Teemo", "Yasuo", "Zed", "Lux", "Jinx", "Vi", "Caitlyn", "Darius", "Draven", "Ekko", "Fizz", "Graves", "Irelia", "Jax", "Jhin", "Karma", "Kayn", "LeeSin"]; 
+        console.error("✗ Error cargando LoL:", error.message);
+        PERSONAJES.lol = [];
     }
 }
-cargarCampeonesDeRiot();
 
-function obtenerTableroAleatorio() {
-    const mezcla = [...TODOS_LOS_CAMPEONES];
+async function cargarValorant() {
+    try {
+        console.log("Cargando Valorant...");
+        const url = "https://valorant-api.com/v1/agents?isPlayableCharacter=true";
+        const respuesta = await axios.get(url);
+        PERSONAJES.valorant = respuesta.data.data.map(agente => ({
+            nombre: agente.displayName,
+            imagen: agente.displayIcon
+        }));
+        console.log(`✓ Valorant: ${PERSONAJES.valorant.length} agentes cargados`);
+    } catch (error) {
+        console.error("✗ Error cargando Valorant:", error.message);
+        PERSONAJES.valorant = [];
+    }
+}
+
+async function cargarPokemon() {
+    try {
+        console.log("Cargando Pokémon...");
+        const url = "https://pokeapi.co/api/v2/pokemon?limit=151";
+        const respuesta = await axios.get(url);
+        PERSONAJES.pokemon = respuesta.data.results.map((poke, index) => ({
+            nombre: capitalize(poke.name),
+            imagen: `https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/other/official-artwork/${index + 1}.png`
+        }));
+        console.log(`✓ Pokémon: ${PERSONAJES.pokemon.length} pokémon cargados`);
+    } catch (error) {
+        console.error("✗ Error cargando Pokémon:", error.message);
+        PERSONAJES.pokemon = [];
+    }
+}
+
+// Inicializar todas las franquicias en paralelo
+Promise.allSettled([cargarLoL(), cargarValorant(), cargarPokemon()])
+    .then(() => {
+        console.log(`\n📊 Universos cargados: LoL=${PERSONAJES.lol.length}, Valorant=${PERSONAJES.valorant.length}, Pokemon=${PERSONAJES.pokemon.length}\n`);
+    });
+
+function obtenerTableroAleatorio(franquicia) {
+    const pool = PERSONAJES[franquicia] || [];
+    if (pool.length === 0) return null;
+
+    const mezcla = [...pool];
     for (let i = mezcla.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
         [mezcla[i], mezcla[j]] = [mezcla[j], mezcla[i]];
@@ -43,25 +91,45 @@ function obtenerTableroAleatorio() {
 
 // LÓGICA SOCKETS
 io.on('connection', (socket) => {
-    
-    socket.on('entrar_sala', (codigoSala) => {
+
+    socket.on('entrar_sala', (data) => {
+        const codigoSala = data.sala || data; // Compatibilidad backward (puede llegar string o objeto)
+        const franquiciaDeseada = typeof data === 'string' ? 'lol' : (data.franquicia || 'lol');
+
         socket.join(codigoSala);
-        
+
         if (!estadoSalas[codigoSala]) {
+            // Primera conexión: crear sala con la franquicia elegida
+            if (!['lol', 'valorant', 'pokemon'].includes(franquiciaDeseada)) {
+                socket.emit('error_franquicia', { mensaje: 'Universo no válido' });
+                return;
+            }
+
+            const personajes = obtenerTableroAleatorio(franquiciaDeseada);
+            if (!personajes) {
+                socket.emit('error_franquicia', { mensaje: 'Universo no disponible temporalmente' });
+                return;
+            }
+
             estadoSalas[codigoSala] = {
                 listos: 0,
-                personajes: obtenerTableroAleatorio(),
-                turno: null, // Guardaremos el ID del socket que tiene el turno
-                jugadores: [] // Lista de IDs para saber a quién le toca
+                franquicia: franquiciaDeseada,
+                personajes: personajes,
+                turno: null,
+                jugadores: []
             };
         }
-        
-        // Registrar jugador en la sala (si no está ya)
+
+        // Registrar jugador en la sala
         if(!estadoSalas[codigoSala].jugadores.includes(socket.id)){
              estadoSalas[codigoSala].jugadores.push(socket.id);
         }
 
-        io.to(codigoSala).emit('iniciar_tablero', estadoSalas[codigoSala].personajes);
+        // Enviar tablero con la franquicia actual (puede diferir de la que el usuario eligió)
+        io.to(codigoSala).emit('iniciar_tablero', {
+            personajes: estadoSalas[codigoSala].personajes,
+            franquicia: estadoSalas[codigoSala].franquicia
+        });
     });
 
     socket.on('jugador_listo', (data) => {

@@ -1,0 +1,265 @@
+/* =====================================================
+   SELECTOR DE FRANQUICIA — Character Select Screen
+   ===================================================== */
+
+/* Label sobre el selector */
+.label-universo {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--text-sm);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-gold);
+  letter-spacing: var(--tracking-wider);
+  text-transform: uppercase;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Grid de paneles */
+#selector-franquicia {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* ===== PANEL ===== */
+.franquicia-panel {
+  position: relative;
+  cursor: pointer;
+  height: 200px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  background: var(--bg-panel, var(--color-surface));
+  border: 1px solid var(--color-border-subtle);
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    border-color 0.2s ease-out,
+    box-shadow 0.2s ease-out;
+  clip-path: polygon(
+    0 6px, 6px 0, calc(100% - 6px) 0, 100% 6px,
+    100% calc(100% - 6px), calc(100% - 6px) 100%,
+    6px 100%, 0 calc(100% - 6px)
+  );
+  animation: fadeInScale 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--animation-delay, 0ms);
+
+  /* Tag en esquina superior izquierda vía data-attribute */
+  --_tag: attr(data-tag);
+}
+
+/* Artwork */
+.panel-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+/* Gradient overlay para legibilidad del texto */
+.panel-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    oklch(6% 0.02 78 / 0.98) 0%,
+    oklch(6% 0.02 78 / 0.55) 45%,
+    transparent 80%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* Tag superior izquierdo */
+.franquicia-panel::before {
+  content: attr(data-tag);
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  font-weight: var(--font-weight-black);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  background: oklch(5% 0.01 78 / 0.85);
+  padding: 2px 8px;
+  z-index: 4;
+  clip-path: polygon(
+    0 2px, 2px 0, calc(100% - 2px) 0, 100% 2px,
+    100% calc(100% - 2px), calc(100% - 2px) 100%,
+    2px 100%, 0 calc(100% - 2px)
+  );
+  transition: color 0.2s ease-out;
+}
+
+/* Texto inferior */
+.panel-info {
+  position: relative;
+  z-index: 2;
+  padding: var(--spacing-sm) var(--spacing-sm) 10px;
+}
+
+.panel-nombre {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--text-subhead);
+  font-weight: var(--font-weight-black);
+  letter-spacing: var(--tracking-tight);
+  text-transform: uppercase;
+  color: var(--color-text-primary);
+  line-height: 1.05;
+  margin-bottom: 3px;
+}
+
+.panel-tagline {
+  display: block;
+  font-family: var(--font-body);
+  font-size: var(--text-caption);
+  font-weight: var(--font-weight-medium);
+  letter-spacing: var(--tracking-wide);
+  text-transform: uppercase;
+  color: var(--color-text-muted);
+  transition: color 0.2s ease-out;
+}
+
+/* Indicador de selección (L superior derecha) */
+.panel-check {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 18px;
+  height: 18px;
+  border-top: 2px solid var(--acento);
+  border-right: 2px solid var(--acento);
+  z-index: 5;
+  opacity: 0;
+  transform: scale(0.6);
+  transition:
+    opacity 0.2s ease-out,
+    transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ===== HOVER ===== */
+.franquicia-panel:hover {
+  transform: translateY(-4px) scale(1.01);
+  border-color: oklch(38% 0.01 78);
+  z-index: 2;
+}
+
+.franquicia-panel:hover .panel-img {
+  transform: scale(1.06);
+}
+
+.franquicia-panel:hover::before {
+  color: var(--color-text-secondary);
+}
+
+/* ===== SELECCIONADO — CSS puro con :has() ===== */
+.franquicia-panel:has(input:checked) {
+  border-color: var(--acento);
+  box-shadow:
+    0 0 0 1px var(--acento),
+    0 8px 32px oklch(0% 0 0 / 0.5),
+    inset 0 0 24px var(--acentoDim);
+  transform: translateY(-5px) scale(1.02);
+  z-index: 3;
+}
+
+.franquicia-panel:has(input:checked) .panel-tagline {
+  color: var(--acento);
+}
+
+.franquicia-panel:has(input:checked)::before {
+  color: var(--acento);
+}
+
+.franquicia-panel:has(input:checked) .panel-overlay {
+  background: linear-gradient(
+    to top,
+    color-mix(in oklch, var(--bg-panel) 95%, transparent) 0%,
+    color-mix(in oklch, var(--bg-panel) 40%, transparent) 45%,
+    transparent 80%
+  );
+}
+
+.franquicia-panel:has(input:checked) .panel-check {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* ===== BLOQUEADO (sala ya creada) ===== */
+#selector-franquicia.bloqueado .franquicia-panel {
+  cursor: default;
+  pointer-events: none;
+  opacity: 0.35;
+  filter: grayscale(40%);
+  transform: none !important;
+}
+
+#selector-franquicia.bloqueado .franquicia-panel:has(input:checked) {
+  opacity: 1;
+  filter: none;
+  transform: none;
+  box-shadow: 0 0 16px var(--acentoDim), inset 0 0 12px var(--acentoDim);
+}
+
+/* ===== FOCUS VISIBLE (teclado) ===== */
+.franquicia-panel:focus-within {
+  outline: var(--focus-outline);
+  outline-offset: 2px;
+}
+
+/* ===== RESPONSIVE TABLET ===== */
+@media (max-width: 768px) {
+  .franquicia-panel {
+    height: 170px;
+  }
+
+  .panel-nombre {
+    font-size: var(--text-base);
+  }
+}
+
+/* ===== RESPONSIVE MOBILE ===== */
+@media (max-width: 479px) {
+  #selector-franquicia {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+
+  .franquicia-panel {
+    height: 140px;
+  }
+
+  .panel-info {
+    padding: var(--spacing-xs) var(--spacing-xs) 8px;
+  }
+
+  .panel-nombre {
+    font-size: var(--text-sm);
+    letter-spacing: -0.01em;
+  }
+
+  .panel-tagline {
+    display: none;
+  }
+
+  .franquicia-panel::before {
+    font-size: 0.5rem;
+    padding: 2px 5px;
+  }
+}
+
+/* ===== REDUCED MOTION ===== */
+@media (prefers-reduced-motion: reduce) {
+  .franquicia-panel,
+  .panel-img,
+  .panel-check {
+    transition: none !important;
+    animation: none !important;
+  }
+}

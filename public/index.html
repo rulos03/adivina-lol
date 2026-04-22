@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="styles/base.css">
     <link rel="stylesheet" href="styles/components.css">
     <link rel="stylesheet" href="styles/animations.css">
+    <link rel="stylesheet" href="styles/franquicia-select.css">
 </head>
 <body>
 
@@ -37,6 +38,19 @@
 
             <!-- Paso 1: Ingresar código de sala -->
             <div id="paso-conexion">
+
+                <!-- Selector visual de franquicia -->
+                <div class="form-group">
+                    <span class="label-universo" id="label-universo">Elige tu universo</span>
+                    <div
+                        id="selector-franquicia"
+                        role="radiogroup"
+                        aria-labelledby="label-universo"
+                        aria-describedby="franquicia-hint"
+                    ></div>
+                    <small id="franquicia-hint">El universo lo elige quien crea la sala</small>
+                </div>
+
                 <div class="form-group">
                     <label for="inputSala">Código de Sala</label>
                     <input
@@ -154,6 +168,7 @@
 
     <!-- Scripts (orden de dependencias) -->
     <script src="/socket.io/socket.io.js"></script>
+    <script src="js/franquicias-config.js"></script>
     <script src="js/game-state.js"></script>
     <script src="js/lazy-load.js"></script>
     <script src="js/ui.js"></script>
